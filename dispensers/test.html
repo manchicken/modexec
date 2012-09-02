@@ -1,0 +1,23 @@
+<html>
+<head>
+  <title>Testing ModExec</title>
+  <script language="javascript" type="text/javascript" src="/jslib/modexec.js"></script>
+  <script language="javascript" type="text/javascript">//<![CDATA[
+var ary = new Array ();
+
+function Page_OnLoad ()
+{
+  meh = new ModExec();
+  meh.exec('ModExecTest', 'foo', null, function (data) {
+    document.getElementById('holder').innerHTML = JSON.stringify(data.value);
+  }, function (data) {
+    document.getElementById('holder').innerHTML = JSON.stringify(data.value);
+  });
+}
+  //]]></script>
+</head>
+<body bgcolor="#FFFFFF" onload="Page_OnLoad()">
+  <span>You should see data here...</span>
+  <div id="holder"></div>
+</body>
+</html>
