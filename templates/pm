@@ -1,21 +1,31 @@
-# <one line to give the program's name and a brief idea of what it does.>
-# Copyright (C) <year>  <name of author>
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-package $MODULE$;
-
 use strict;
+use warnings;
+
+=head1 NAME
+
+Module - Brief Description
+
+=cut
+
+package Module;
+
+=head1 VERSION
+
+1.0.0
+
+=cut
+
+our $VERSION = q{1.0.0};
+
+=head1 SYNOPSIS
+
+    use Module
+
+=head2 DESCRIPTION
+
+Some useful stuff here
+
+=cut
 
 require Exporter;
 use vars       qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
@@ -58,26 +68,19 @@ END { }       # module clean-up code here (global destructor)
 
 1;
 
-__END__
+=head1 COPYING
 
-=head1 NAME
+Copyright (C) <year>  <name of author>
 
-ModuleName - short discription of your program
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-=head1 SYNOPSIS
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- how to us your module
-
-=head1 DESCRIPTION
-
- long description of your module
-
-=head1 SEE ALSO
-
- need to know things before somebody uses your program
-
-=head1 AUTHOR
-
- $AUTHOR$
-
-=cut
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

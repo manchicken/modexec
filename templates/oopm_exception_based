@@ -69,7 +69,7 @@ Returns an instance of the exception.
 
 sub new {
     my ( $pkg, $error_code, $error_message ) = @_;
-    my $self = $pkg->SUPER::new($error_message);
+    my $self = $pkg->SUPER::new->($error_message);
 
     bless $self, $pkg;
 
@@ -106,63 +106,11 @@ sub errstr {
     return $self->{'_message'} // undef;
 }
 
-=head2 errcode([error_code])
-
-Fetch and optionally set the error code.
-
-Arguments:
-  $error_code .. The error code to use (optional)
-
-Returns the current error code.
-
-=cut
-
-sub errcode {
-    my ( $self, $code ) = @_;
-
-    $self->{'_code'} = $code
-        if defined $code;
-
-    return $self->{'_code'} // undef;
-}
-
-=head2 stack([stack_dump])
-
-Fetch and optionally set the stack dump.
-
-Arguments:
-  $stack_dump .. The stack dump to use (optional)
-
-Returns the current stack dump.
-
-=cut
-
-sub stack {
-    my ( $self, $stack ) = @_;
-
-    $self->{'_stack'} = $stack
-        if defined $stack;
-
-    return $self->{'_stack'} // undef;
-}
-
-=head2 stringify()
-
-Return a string containing the data contained in the instance.
-
-=cut
-
-sub stringify {
-    my ($self) = @_;
-
-    return $self->errcode() . ": " . $self->errstr() . "\n" . $self->stack();
-}
-
 1;
 
 =head1 DIAGNOSTICS
 
-This class is intended to be the reporter of errors, and as such it doesn't really have any errors of its own.
+USEFUL STUFF
 
 =head1 AUTHOR
 

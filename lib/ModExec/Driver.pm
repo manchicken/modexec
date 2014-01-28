@@ -1,32 +1,110 @@
-# Driver.pm -- Driver interface for ModExec
-# Copyright (C) 2006-2007  Michael D. Stemle, Jr. and DW Data, Inc.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-package ModExec::Driver;
 use strict;
 use warnings;
+use 5.010;
+
+=head1 NAME
+
+Driver.pm -- Driver interface for ModExec
+
+=cut
+
+package ModExec::Driver;
+
+=head1 VERSION
+
+ModExec 1.0
+
+=cut
+
+our $VERSION = '1.0';
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item Error (for error handling and exceptions)
+
+=item Module::Load (for loading driver engine modules)
+
+=back
+
+=cut
+
 use Error qw/:try/;
 use ModExec::Exception;
-use Data::Dumper;
 
-our $VERSION = 0.1;
+=head1 SYNOPSIS
 
-require Exporter;
-our @ISA = qw/Exporter/;
-our @EXPORT = qw();
-our @EXPORT_OK = qw();
+ use ModExec::Driver;
+
+ my $driver = ModExec::Driver->load( engine => 'JSON' );
+ my $struct_to_return = {"array" => [1,2,3], "associative_array" => {"foo"=>"bar"}};
+ my %hash_to_return = (a=>1, b=>2, c=>3);
+ my @array_to_return = qw/a b c/;
+ my $exec_args = $driver->grab_data();
+ 
+ # Assuming "do_something" is the function you wish to execute
+ $driver->exec ("do_something", $struct_to_return);
+ # OR
+ $driver->exec ("do_something", \%hash_to_return);
+ # OR
+ $driver->exec ("do_something", \@array_to_return);
+
+=head1 DESCRIPTION
+
+This module is intended to be a layer that allows DigitalWork ModExec to communicate with multiple callers.  Only scalars, and refs to hashes and arrays are permitted.  Blessed references are not transmitted.
+
+=head1 CLASS METHODS
+
+=head2 load()
+
+This factory method loads the desired driver module and returns an instance to it.
+
+=head3 Arguments
+
+=over 4
+
+=item engine
+
+This is the name of the driver engine.
+
+=item options
+
+This is a hashref that you want to send to the engine when it initializes.
+
+=back
+
+=head3 Default Engines
+
+Currently there are two engines supported by default:
+
+=over 4
+
+=item JSON
+
+This engine takes JSON in and returns JSON out.
+
+=item Perl
+
+This engine is for pure Perl interfaces wanting to integrate with modules used in the ModExec framework. Items calling the Perl engine should observe all of the same security precautions and such that you would if you were calling it from an external dispenser.
+
+=back
+
+=cut
+
+sub load {
+  my ( $pkg, %args ) = @_;
+
+  if ( ! exists $args{engine} ) {
+    throw ModExec::Exception('ERR_INSUFFICIENT_DATA', 'No engine supplied to load().');
+  }
+}
+
+=head1 INSTANCE METHODS
+
+=head2 init(int auth, string module_name)
+
+=cut
 
 sub module_name {
   my ($self, $mod_name) = @_;
@@ -135,34 +213,19 @@ sub exec {
 
 1;
 
-__END__
-=pod
+=head1 LICENSE AND COPYRIGHT
 
-=head1 NAME
+Copyright (C) 2005-2014  Michael D. Stemle, Jr. <manchicken@notsosoft.net>
 
-ModExec::Driver - A driver abstraction for DigitalWork ModExec.
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-=head1 SYNOPSIS
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
- use ModExec::Driver;
-
- my $driver = new ModExec::Driver (-engine => "JSON");
- my $struct_to_return = {"array" => [1,2,3], "associative_array" => {"foo"=>"bar"}};
- my %hash_to_return = (a=>1, b=>2, c=>3);
- my @array_to_return = qw/a b c/;
- my $exec_args = $driver->grab_data ();
- 
-# Assuming "do_something" is the function you wish to execute
- $driver->exec ("do_something", $struct_to_return);
-# OR
- $driver->exec ("do_something", \%hash_to_return);
-# OR
- $driver->exec ("do_something", \@array_to_return);
-
-=head1 DESCRIPTION
-
-This module is intended to be a layer that allows DigitalWork ModExec to communicate with multiple callers.  Only scalars, and refs to hashes and arrays are permitted.  Blessed references are not transmitted.
-
-=head2 init(int auth, string module_name)
-
-=cut
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

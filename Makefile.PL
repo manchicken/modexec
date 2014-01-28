@@ -1,5 +1,5 @@
 # ModExec.pm -- An abstraction layer providing more direct execution of Perl modules
-# Copyright (C) 2006-2007  Michael D. Stemle, Jr. and DW Data, Inc.
+# Copyright (C) 2006-2014  Michael D. Stemle, Jr.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,5 +23,5 @@ WriteMakefile(
     PREREQ_PM         => {JSON=>1.07, URI::Escape=>3.28}, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/ModExec.pm', # retrieve abstract from module
-       AUTHOR         => 'Michael D. Stemle <manchicken@notsosoft.net> and DW Data, Inc.') : ()),
+       AUTHOR         => 'Michael D. Stemle <manchicken@notsosoft.net>') : ()),
 );
