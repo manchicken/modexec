@@ -9,6 +9,7 @@ package ModExec::Exception;
 use strict;
 use warnings;
 use 5.010;
+use base qw/Exporter/;
 
 =head1 VERSION
 
@@ -22,9 +23,7 @@ our $VERSION = '1.0';
 
 =over 4
 
-=item Error::Simple (base class)
-
-=item Error (for error handling and exceptions)
+=item Try::Tiny (for syntax sugar)
 
 =item Carp (stack traces, uses longmess)
 
@@ -32,9 +31,11 @@ our $VERSION = '1.0';
 
 =cut
 
-use base 'Error::Simple';
 use Carp;
-use Error qw/:try/;
+use Try::Tiny;
+
+# No Critic DGR: Makes life easier for our users
+our @EXPORT = qw/try catch finally/; ## no critic (ProhibitAutomaticExportation)
 
 =head1 SYNOPSIS
 
@@ -69,7 +70,7 @@ Returns an instance of the exception.
 
 sub new {
     my ( $pkg, $error_code, $error_message ) = @_;
-    my $self = $pkg->SUPER::new($error_message);
+    my $self = {};
 
     bless $self, $pkg;
 
@@ -157,6 +158,22 @@ sub stringify {
 
     return $self->errcode() . ": " . $self->errstr() . "\n" . $self->stack();
 }
+
+=head2 throw()
+
+Die with an instance of this class.
+
+Usage: throw ModExec::Exception->new( $code, $message )
+
+=cut
+
+sub throw {
+    my ($pkg, @args) = @_;
+
+    # No Critic DGR: Carp::croak screws up the object being thrown.
+    die $pkg->new( @args ); ## no critic (RequireCarping)
+}
+
 
 1;
 

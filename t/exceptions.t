@@ -18,30 +18,57 @@ use strict;
 use warnings;
 use 5.010;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use Test::Exception;
+use English q{-no_match_vars};
+use Data::Dumper;
 
 # Load the module using C<use_ok()>
-use_ok q{ModExec::Exception};
+sub BEGIN {
+	use_ok q{ModExec::Exception};
+}
 
-# Verify that instantiation gives us both a C<ModExec::Exception> and C<Error::Simple>
+# Verify that instantiation gives us a C<ModExec::Exception> instance.
 my $test1 = ModExec::Exception->new();
-isa_ok $test1, q{ModExec::Exception}, 'Verify we got a ModExec::Exception instance...';
-isa_ok $test1, q{Error::Simple}, 'Verify we got an Error::Simple instance...';
+isa_ok $test1, q{ModExec::Exception},
+    'Verify we got a ModExec::Exception instance...';
 
 # Verify we can set just the error message
-$test1->errstr( q{TEST1} );
+$test1->errstr(q{TEST1});
 is $test1->errstr(), q{TEST1}, 'Verify we can set only the error message...';
 
 # Verify we can set just the error code
-$test1->errcode( q{ERR_CODE1} );
-is $test1->errcode(), q{ERR_CODE1}, 'Verify we can set only the error code...';
+$test1->errcode(q{ERR_CODE1});
+is $test1->errcode(), q{ERR_CODE1},
+    'Verify we can set only the error code...';
 
 # Verify we can set both error code and error message via errstr()...
 $test1->errstr( q{TEST2}, q{ERR_CODE2} );
-is $test1->errstr(), q{TEST2}, 'Verify we set the error message...';
+is $test1->errstr(),  q{TEST2},     'Verify we set the error message...';
 is $test1->errcode(), q{ERR_CODE2}, 'Verify we set the error code...';
 
+# Verify that we have a stack which includes our test name...
+like $test1->stack(), qr{$0}x,
+    'Verify that the stack trace includes the test script name...';
+
+# Verify stringify
+like $test1->stringify(), qr{
+		\A        # The beginning of the string
+		ERR_CODE2 # The error code we last set
+		:\s       # A colon and a space
+		TEST2     # The string TEST2 for the error message
+		\n        # A literal newline
+		.*?$0     # The program name
+	}x, 'Verify that our stringify output looks correct...';
+
+# Let's verify that this behaves like an exception with Error qw/:try/ sugar
+my $boom = 0;
+try {
+    ModExec::Exception->throw( 'ERR_CODE3', 'TEST3' );
+} catch {
+    $boom = $ARG;
+};
+isa_ok $boom, q{ModExec::Exception}, 'Verify that Error\'s try/catch sugar works...';
 
 =head1 SEE ALSO
 
