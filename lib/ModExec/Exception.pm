@@ -1,7 +1,7 @@
 
 =head1 NAME
 
-ModExec::Exception - A simple exception class definition. Extends L<Error::Simple>.
+ModExec::Exception - A simple exception class definition.
 
 =cut
 
@@ -31,6 +31,7 @@ our $VERSION = '1.0';
 
 =cut
 
+use English qw/-no_match_vars/;
 use Carp;
 use Try::Tiny;
 
@@ -52,13 +53,13 @@ our @EXPORT = qw/try catch finally/; ## no critic (ProhibitAutomaticExportation)
 
 =head1 DESCRIPTION
 
-This is a simple exception class.
+This is a simple exception class. This exports C<Tiny::Try> functions, too.
 
 =head1 SUBROUTINES/METHODS
 
 =head2 new(error_code, error_message)
 
-Construct an instance of the object, inheriting from C<Error::Simple> and return it.
+Construct an instance of the object.
 
 Arguments:
   $error_code ..... The error code to use
@@ -69,7 +70,7 @@ Returns an instance of the exception.
 =cut
 
 sub new {
-    my ( $pkg, $error_code, $error_message ) = @_;
+    my ( $pkg, $error_code, $error_message ) = @ARG;
     my $self = {};
 
     bless $self, $pkg;
@@ -97,7 +98,7 @@ Returns the current error message.
 =cut
 
 sub errstr {
-    my ( $self, $error_message, $error_code ) = @_;
+    my ( $self, $error_message, $error_code ) = @ARG;
 
     $self->{'_code'} = $error_code
         if defined $error_code;
@@ -119,7 +120,7 @@ Returns the current error code.
 =cut
 
 sub errcode {
-    my ( $self, $code ) = @_;
+    my ( $self, $code ) = @ARG;
 
     $self->{'_code'} = $code
         if defined $code;
@@ -139,7 +140,7 @@ Returns the current stack dump.
 =cut
 
 sub stack {
-    my ( $self, $stack ) = @_;
+    my ( $self, $stack ) = @ARG;
 
     $self->{'_stack'} = $stack
         if defined $stack;
@@ -154,7 +155,7 @@ Return a string containing the data contained in the instance.
 =cut
 
 sub stringify {
-    my ($self) = @_;
+    my ($self) = @ARG;
 
     return $self->errcode() . ": " . $self->errstr() . "\n" . $self->stack();
 }
@@ -168,7 +169,12 @@ Usage: throw ModExec::Exception->new( $code, $message )
 =cut
 
 sub throw {
-    my ($pkg, @args) = @_;
+    my ($pkg, @args) = @ARG;
+
+    # It's possible that we're re-throwing, let's deal with that.
+    if ( ref $pkg ) {
+      die $pkg;
+    }
 
     # No Critic DGR: Carp::croak screws up the object being thrown.
     die $pkg->new( @args ); ## no critic (RequireCarping)

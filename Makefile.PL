@@ -16,12 +16,24 @@
 
 use 5.008008;
 use ExtUtils::MakeMaker;
+use English qw/-no_match_vars/;
 
 WriteMakefile(
-    NAME              => 'ModExec',
-    VERSION_FROM      => 'lib/ModExec.pm', # finds $VERSION
-    PREREQ_PM         => {JSON=>1.07, URI::Escape=>3.28}, # e.g., Module::Name => 1.1
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/ModExec.pm', # retrieve abstract from module
-       AUTHOR         => 'Michael D. Stemle <manchicken@notsosoft.net>') : ()),
+    NAME         => 'ModExec',
+    VERSION_FROM => 'lib/ModExec.pm',    # finds $VERSION
+    PREREQ_PM    => {
+        q|JSON|         => 2.59,
+        q|URI::Escape|  => 3.31,
+        q|Module::Load| => 0.18,
+        q|Try::Tiny|    => 0.16,
+        q|Readonly|     => 1.03
+    },                                   # e.g., Module::Name => 1.1
+    (   $OLD_PERL_VERSION >= 5.005
+        ?    ## Add these new keywords supported since 5.005
+            (
+            ABSTRACT_FROM => 'lib/ModExec.pm', # retrieve abstract from module
+            AUTHOR => 'Michael D. Stemle <manchicken@notsosoft.net>'
+            )
+        : ()
+    ),
 );

@@ -29,17 +29,6 @@ our @ISA = qw/Exporter ModExec::Driver/;
 our @EXPORT = qw(driver_init);
 our @EXPORT_OK = qw();
 
-sub driver_init {
-  my ($module, $auth) = @_;
-  my $self = undef;
-
-  $self = new ModExec::Driver::JSON ();
-  $self->init ($auth, $module);
-  $self->init_module ();
-
-  return $self;
-}
-
 sub exec {
   my ($self, $func, $args) = @_;
 

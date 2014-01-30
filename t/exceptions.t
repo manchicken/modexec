@@ -70,19 +70,20 @@ try {
 };
 isa_ok $boom, q{ModExec::Exception}, 'Verify that Error\'s try/catch sugar works...';
 
+try {
+	try {
+	    ModExec::Exception->throw( 'ERR_CODE3', 'TEST3' );
+	}
+	catch {
+		$ERRNO->throw();
+	};
+} catch {
+
+};
+
 =head1 SEE ALSO
 
  L<Test::More>, L<Test::Exception>
-
-=head1 AUTHOR
-
- $AUTHOR$
-
-=cut
-
-=head1 DIAGNOSTICS
-
-USEFUL STUFF
 
 =head1 AUTHOR
 

@@ -30,7 +30,6 @@ our $VERSION = '1.0';
 
 =cut
 
-use Error qw/:try/;
 use ModExec::Exception;
 
 =head1 SYNOPSIS
@@ -92,6 +91,16 @@ This engine is for pure Perl interfaces wanting to integrate with modules used i
 
 =cut
 
+sub init_driver {
+  my ($pkg, $module, $secure) = @_;
+
+  my $self = $pkg->new();
+  $self->init($secure, $module);
+  $self->init_module();
+
+  return $self;
+}
+
 sub load {
   my ( $pkg, %args ) = @_;
 
@@ -102,7 +111,7 @@ sub load {
 
 =head1 INSTANCE METHODS
 
-=head2 init(int auth, string module_name)
+=head2 init(int secure, string module_name)
 
 =cut
 
@@ -113,21 +122,21 @@ sub module_name {
   return $self->{_module_name};
 }
 
-sub auth {
-  my ($self, $auth) = @_;
+sub secure {
+  my ($self, $secure) = @_;
 
-  $self->{_auth} = $auth if defined($auth);
-  return $self->{_auth};
+  $self->{_secure} = $secure if defined($secure);
+  return $self->{_secure};
 }
 
 sub init {
-  my ($self, $auth, $modname) = @_;
+  my ($self, $secure, $modname) = @_;
 
   if (!defined ($modname)) {
     throw ModExec::Exception ("ERR_INSUFFICIENT_DATA", "Undefined module name");
   }
 
-  $self->auth ($auth || 0);
+  $self->secure ($secure || 0);
   $self->module_name ($modname);
 
   return 1;
@@ -138,10 +147,10 @@ sub init_module {
   my $use_module = undef;
 
   $use_module = $self->module_name;
-  if ($use_module !~ m/^([a-zA-Z0-9_-]+(::[a-zA-Z0-9_-]+)*)$/si) {
+  if ($use_module !~ $ModExec::PACKAGE_SECURITY_PATTERN) {
     throw ModExec::Exception ("ERR_MODEXEC_SECURITY", "Sorry, the module name you specified is not valid.");
   }
-  $use_module = $1;
+  # $use_module = $2;
   eval qq{use $use_module qw{modexec_export};};
   if ($@) {
     throw ModExec::Exception ("ERR_MODEXEC_BAD_LOAD", "Failed to load module '${use_module}': $@");
@@ -149,7 +158,7 @@ sub init_module {
   if (!defined (&modexec_export)) {
     throw ModExec::Exception ("ERR_MODEXEC_DRIVERHOOK", "Module ${use_module} does not implement DriverHook");
   }
-  $self->{modexec_funcs} = modexec_export ($self->auth);
+  $self->{modexec_funcs} = modexec_export ($self->secure);
   if ((grep { m/\w+\s*\(.*?\)/ } keys (%{$self->{modexec_funcs}})) <
       keys (%{$self->{modexec_funcs}})) {
     throw ModExec::Exception ("ERR_INVALID_MODEXEC_MODULE", $self->module_name . ": modexec_export() returned functions without prototypes.  Please specify prototypes.");

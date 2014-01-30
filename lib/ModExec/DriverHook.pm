@@ -17,7 +17,6 @@
 package ModExec::DriverHook;
 use strict;
 use warnings;
-use Error qw/:try/;
 use ModExec::Exception;
 
 our $VERSION = 0.1;
