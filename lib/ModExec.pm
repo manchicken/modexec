@@ -125,7 +125,10 @@ sub prepare {
                 "Driver >${driver_class}< does not implement Driver." );
         }
 
-        $driver_handle = $driver_class->init_driver( $module_name, $secure );
+        $driver_handle = $driver_class->init_driver(
+            module => $module_name,
+            secure => $secure
+        );
     }
     catch {
         if ( ref $ARG && $ARG->isa(q{ModExec::Exception}) ) {

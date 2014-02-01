@@ -17,7 +17,7 @@ sub modexec_export {
   my $funcs = {};
 
   $funcs = {
-    "foo()"=>\&foo,
+    "foo"=>\&foo,
   };
 }
 

@@ -26,7 +26,8 @@ WriteMakefile(
         q|URI::Escape|  => 3.31,
         q|Module::Load| => 0.18,
         q|Try::Tiny|    => 0.16,
-        q|Readonly|     => 1.03
+        q|Readonly|     => 1.03,
+        q|Scalar::Util| => 1.23,
     },                                   # e.g., Module::Name => 1.1
     (   $OLD_PERL_VERSION >= 5.005
         ?    ## Add these new keywords supported since 5.005
