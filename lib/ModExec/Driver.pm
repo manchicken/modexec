@@ -1,6 +1,3 @@
-use strict;
-use warnings;
-use 5.010;
 
 =head1 NAME
 
@@ -9,6 +6,9 @@ Driver.pm -- Driver interface for ModExec
 =cut
 
 package ModExec::Driver;
+use strict;
+use warnings;
+use 5.010;
 
 =head1 VERSION
 
@@ -141,7 +141,7 @@ This method optionally sets the secure flag on the driver.
 
 Arguments:
 
- $secure - (optional) The secure flag to use.
+ - $secure .. (optional) The secure flag to use.
 
 Return the current/new secure flag for the module.
 
@@ -188,16 +188,14 @@ sub init_module {
         }
 
         # Make sure the module implements modexec_export()
-        if ( !$module_to_use->can('modexec_export') ) {
+        my $modexec_export_ref = $module_to_use->can('modexec_export');
+        if ( !$modexec_export_ref ) {
             ModExec::Exception->throw( "ERR_INVALID_MODEXEC_MODULE",
                 "Module >${module_to_use}< does not implement modexec_export()."
             );
         }
 
         # Load the publicly exported functions
-        my $modexec_export_ref = undef;
-        say "\$modexec_export_ref = \\&${module_to_use}::modexec_export";
-        eval "\$modexec_export_ref = \\&${module_to_use}::modexec_export";
         $self->{modexec_funcs} = $modexec_export_ref->( $self->secure );
 
         # Verify we actually got a hash back...
@@ -244,53 +242,53 @@ sub init_module {
     return;
 }
 
-sub get_func_by_proto {
-    my ( $self, $func, $prototype ) = @_;
+=head2 func_exec()
 
-    my $qfunc        = undef;
-    my $qproto       = undef;
-    my @matches      = ();
-    my $proto_name   = undef;
-    my $proto_re     = undef;
-    my @symbol_table = ();
+Execute a function and return it to the driver.
 
-    $qfunc        = quotemeta($func);
-    $qproto       = quotemeta($prototype);
-    $proto_name   = "${func}${prototype}";
-    $proto_re     = qr!$qfunc\s*$qproto!;
-    @symbol_table = keys( %{ $self->{modexec_funcs} } );
-    @matches      = grep {m/$proto_re/} @symbol_table;
-    if ( !scalar(@matches) ) {
-        throw ModExec::Exception( "ERR_INVALID_MODEXEC_FUNCTION",
-            "Failed to modexec function ${proto_name}: No such function." );
-    }
-    if ( scalar(@matches) > 1 ) {
-        throw ModExec::Exception( "ERR_INVALID_MODEXEC_FUNCTION",
-            "Multiple matches for prototype '${proto_name}'." );
-    }
+This function is intended to be called by C<exec()>, which should be defined per driver. This is merely a convenience method to the drivers to perform the symbol lookup and execution so that the driver can focus entirely on its translation of inputs and outputs.
 
-    return $self->{modexec_funcs}->{ $matches[-1] };
-}
+Arguments (as a hash):
+
+ - function ... The name of the function within the module to execute. An exception will be thrown if there are no appropriate functions found exported. Note: if you want to call a function in a module you will need to export it when you override the L<ModExec::DriverHook> C<modexec_export()> function.
+ - arguments .. The arguments to pass through to the function.
+
+=cut
 
 sub func_exec {
-    my ( $self, $func, $args ) = @_;
+    my ( $self, %args ) = @_;
 
-    # Execute the function
-    if ( !defined($args) ) {
-        return $self->get_func_by_proto( $func, "()" )->();
-    } elsif ( ref($args) eq "ARRAY" ) {
-        return $self->get_func_by_proto( $func, "(@)" )->( @{$args} );
-    } elsif ( ref($args) eq "HASH" ) {
-        return $self->get_func_by_proto( $func, "(%)" )->(%$args);
-    } else {
-        return $self->get_func_by_proto( $func, '($)' )->($args);
+    my $function_name = delete $args{function};
+    my $arguments     = delete $args{arguments};
+
+    # Get the function
+    my $function = $self->{modexec_funcs}->{$function_name}
+        // ModExec::Exception->throw( 'ERR_INVALID_FUNCTION',
+        'No appropriate function was found.' );
+
+    # Handle anything the function might throw at us...
+    try {
+        return $function->($arguments);
     }
+    catch {
+        if ( blessed $ARG ) {
+            $ARG->throw();
+        } else {
+            ModExec::Exception->throw( 'ERR_UNKNOWN',
+                "Caught unexpected exception: $ARG" );
+        }
+    };
 
-    throw ModExec::Exception( "ERR_INVALID_FUNCTION",
-        "No appropriate function prototype was found." );
+    return;
 }
 
-sub exec {
+=head2 execute()
+
+This method must be overridden by a subclass. An exception will be thrown if this method is called directly.
+
+=cut
+
+sub execute {
     throw ModExec::Exception( "ERR_ABSTRACT_FUNCTION",
         "ModExec::Driver->exec() should have been over-ridden by the specific driver module."
     );
