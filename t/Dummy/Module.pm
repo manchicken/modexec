@@ -4,9 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-require Exporter;
-our @ISA = qw/Exporter ModExec::DriverHook/;
-our @EXPORT = qw/modexec_export/;
+use base qw/Exporter ModExec::DriverHook/;
 
 sub foo {
 	say __PACKAGE__.' - FOO!';

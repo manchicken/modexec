@@ -21,7 +21,7 @@ use 5.010;
 use FindBin qw/$Bin/;
 use lib $Bin;
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 use Test::Exception;
 use English q{-no_match_vars};
 use Data::Dumper;
@@ -35,6 +35,7 @@ sub BEGIN {
 my $meh = undef;
 try {
 	say 'Trying!';
+	# Test preparing the module
 	$meh = ModExec->prepare(
 		driver => 'Dummy::Driver',
 		module => 'Dummy::Module',
@@ -45,8 +46,14 @@ try {
 	say $ERRNO->stringify() if ref $ERRNO;
 };
 
+# Verify that the driver isa Dummy::Driver
 isa_ok $meh, q|Dummy::Driver|, 'Verify we got a driver...';
+
+# Verify that the module name matches what we want it to.
 is $meh->module_name(), q|Dummy::Module|, 'Verify it thinks it loaded the module...';
+
+# Verify we can call the method we wanted...
+ok $meh->module_can('foo'), 'Verify that we can call the function we defined, foo()...';
 
 =head1 SEE ALSO
 

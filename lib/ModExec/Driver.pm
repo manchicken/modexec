@@ -190,7 +190,7 @@ sub init_module {
         # Make sure the module implements modexec_export()
         my $modexec_export_ref = $module_to_use->can('modexec_export');
         if ( !$modexec_export_ref ) {
-            ModExec::Exception->throw( "ERR_INVALID_MODEXEC_MODULE",
+            ModExec::Exception->throw( 'ERR_INVALID_MODEXEC_MODULE',
                 "Module >${module_to_use}< does not implement modexec_export()."
             );
         }
@@ -200,7 +200,7 @@ sub init_module {
 
         # Verify we actually got a hash back...
         if ( reftype $self->{modexec_funcs} ne 'HASH' ) {
-            ModExec::Exception->throw( "ERR_INVALID_MODEXEC_MODULE",
+            ModExec::Exception->throw( 'ERR_INVALID_MODEXEC_MODULE',
                 "$module_to_use is unavailable for use." );
         }
 
@@ -209,12 +209,12 @@ sub init_module {
           \A             # Start of string
           [a-z][a-z0-9]* # The name of the function, must start with a letter.
           \Z             # End of the string
-        }xsi;
+        }xsmi;
         foreach my $exported_function ( keys %{ $self->{modexec_funcs} } ) {
 
             # Verify that the function names are valid...
             if ( $exported_function !~ $valid_function_pattern ) {
-                ModExec::Exception->throw( "ERR_INVALID_MODEXEC_MODULE",
+                ModExec::Exception->throw( 'ERR_INVALID_MODEXEC_MODULE',
                     "$module_to_use: modexec_export() attempted to export invalid formats or functions."
                 );
             }
@@ -223,7 +223,7 @@ sub init_module {
             elsif ( reftype $self->{modexec_funcs}->{$exported_function} ne
                 'CODE' )
             {
-                ModExec::Exception->throw( "ERR_INVALID_MODEXEC_MODULE",
+                ModExec::Exception->throw( 'ERR_INVALID_MODEXEC_MODULE',
                     "$module_to_use: modexec_export() attempted to export invalid functions."
                 );
             }
@@ -282,6 +282,20 @@ sub func_exec {
     return;
 }
 
+=head2 module_can($function_name)
+
+This tells us if we are able to execute the specific function in the loaded module.
+
+Returns wether or not the function was found in the module.
+
+=cut
+
+sub module_can {
+    my ( $self, $function_name ) = @_;
+
+    return ( exists $self->{modexec_funcs}->{$function_name} );
+}
+
 =head2 execute()
 
 This method must be overridden by a subclass. An exception will be thrown if this method is called directly.
@@ -295,6 +309,14 @@ sub execute {
 }
 
 1;
+
+=DIAGNOSTICS
+
+Methods in this package all throw exceptions in error cases. Please use L<Try::Tiny|Try::Tiny> to catch them.
+
+=AUTHOR
+
+Michael D. Stemle, Jr. <manchicken@notsosoft.net>
 
 =head1 LICENSE AND COPYRIGHT
 
