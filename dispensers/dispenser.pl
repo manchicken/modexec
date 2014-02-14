@@ -1,21 +1,18 @@
-#!/usr/bin/perl
-# index.cgi - A CGI ModExec dispenser
-# Copyright (C) 2006-2007  Michael D. Stemle, Jr. and DW Data, Inc.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#!/usr/bin/env perl
+
+=head1 NAME
+
+dispenser.pl - A CGI ModExec dispenser
+
+=head1 DESCRIPTION
+
+This is a legacy dispenser developed a E<long> time ago, and is really for reference purposes only.
+
+=cut
+
 use strict;
 use warnings;
+use 5.010;
 
 use lib qw(./);
 use Error qw/:try/;
@@ -88,3 +85,24 @@ sub main () {
   return 0;
 }
 &main;
+
+=head1 AUTHOR
+
+Michael D. Stemle, Jr. <manchicken@notsosoft.net>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2005-2014  Michael D. Stemle, Jr. <manchicken@notsosoft.net>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

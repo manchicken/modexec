@@ -1,6 +1,4 @@
 
-=pod
-
 =head1 NAME
 
 ModExec - An abstraction layer providing more direct execution of Perl modules
