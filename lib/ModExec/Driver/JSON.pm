@@ -1,5 +1,5 @@
 # JSON.pm -- A modexec driver for JSON interaction
-# Copyright (C) 2006-2014  Michael D. Stemle, Jr.
+# Copyright (C) 2006-2016  Michael D. Stemle, Jr.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,10 +17,11 @@
 package ModExec::Driver::JSON;
 use strict;
 use warnings;
-use Error qw/:try/;
 use ModExec::Driver;
 use ModExec::Exception;
 use JSON;
+use Scalar::Util qw/blessed reftype looks_like_number/;
+use English qw/-no_match_vars/;
 
 our $VERSION = 0.1;
 
@@ -47,31 +48,30 @@ sub exec {
       $args = $json_args;
     } catch ModExec::Exception with {
       my $err = shift;
-      throw $err;
-    } otherwise {
-      # Don't do anything here.
-      throw ModExec::Exception ("ERR_INVALID_ARGUMENTS", "Arguments '${orig_args}' are not JSON compatible.");
+      $err->throw();
+    } catch {
+      # Bad arguments...
+      ModExec::Exception->throw("ERR_INVALID_ARGUMENTS", "Arguments '${orig_args}' are not JSON compatible.");
     };
   } elsif ($args =~ m/^\"(.*)\"$/) {
     $args = $1;
   }
 
   # Execute the function
-  try {
-    $retval = $self->func_exec ($func, $args);
+  return try {
+    $retval = $self->func_exec( function => $func, arguments => $args );
     $to_return = objToJson ({'value'=>$retval});
     if ($retval && !$to_return) {
-      throw ModExec::Exception ("ERR_MODEXEC_EXECEPTION", "Got a return value, but JSON returned nothing.\n");
+      ModExec::Exception->throw("ERR_MODEXEC_EXECEPTION", "Got a return value, but JSON returned nothing.\n");
     }
-  } catch ModExec::Exception with {
-    my $err = shift;
-    throw $err;
-  } otherwise {
-    my $err = shift;
-    throw ModExec::Exception ("ERR_MODEXEC_EXCEPTION", "The return of the function called was not compatible with JSON.  Please ensure that all ModExec functions return simple types (scalar, array-ref, hash-ref): " . $err->stringify);
-  };
+    
+    return $to_return;
+  }
+  catch {
+    blessed( $ARG ) && $ARG->throw(); # Rethrow
 
-  return $to_return;
+    ModExec::Exception->throw("ERR_MODEXEC_EXCEPTION", "The return of the function called was not compatible with JSON.  Please ensure that all ModExec functions return simple types (scalar, array-ref, hash-ref): " . $ARG);
+  };
 }
 
 sub new {

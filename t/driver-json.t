@@ -32,9 +32,10 @@ sub BEGIN {
 
 my $meh = undef;
 try {
+  say 'Trying!';
   # Test preparing the module
   $meh = ModExec->prepare(
-    driver => 'Dummy::Driver',
+    driver => 'ModExec::Driver::JSON',
     module => 'Dummy::Module',
   );
   
@@ -47,13 +48,13 @@ try {
 };
 
 # Verify that the driver isa Dummy::Driver
-isa_ok $meh, q|Dummy::Driver|, 'Verify we got a driver...';
+isa_ok $meh, q|ModExec::Driver::JSON|, 'Verify we got a driver...';
 # Verify that the module name matches what we want it to.
 is $meh->module_name(), q|Dummy::Module|, 'Verify it thinks it loaded the module...';
 # Verify we can call the method we wanted...
 ok $meh->module_can('foo'), 'Verify that we can call the function we defined, foo()...';
 say '>'.$meh->exec('foo', {}).'<';
-is $meh->exec('foo', {}), q|Dummy::Module - FOO!|, 'Verify that the execution passes!';
+is $meh->exec('foo', {}), q|{"value":"Dummy::Module - FOO!"}|, 'Verify that the execution passes!';
 
 =head1 SEE ALSO
 
