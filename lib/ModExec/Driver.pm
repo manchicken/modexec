@@ -297,13 +297,13 @@ sub module_can {
     return ( exists $self->{modexec_funcs}->{$function_name} );
 }
 
-=head2 execute()
+=head2 exec()
 
 This method must be overridden by a subclass. An exception will be thrown if this method is called directly.
 
 =cut
 
-sub execute {
+sub exec {
     throw ModExec::Exception( "ERR_ABSTRACT_FUNCTION",
         "ModExec::Driver->exec() should have been over-ridden by the specific driver module."
     );
