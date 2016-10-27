@@ -267,7 +267,8 @@ sub func_exec {
         'No appropriate function was found.' );
 
     # Handle anything the function might throw at us...
-    try {
+    return try {
+        # say "Returning!!!! >".$function->($arguments)."<";
         return $function->($arguments);
     }
     catch {
@@ -320,7 +321,7 @@ Michael D. Stemle, Jr. <manchicken@notsosoft.net>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2005-2014  Michael D. Stemle, Jr. <manchicken@notsosoft.net>
+Copyright (C) 2005-2016  Michael D. Stemle, Jr. <manchicken@notsosoft.net>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

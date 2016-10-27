@@ -8,14 +8,15 @@ use base qw/Exporter ModExec::DriverHook/;
 
 sub foo {
 	say __PACKAGE__.' - FOO!';
+    return ''.__PACKAGE__.' - FOO!';
 }
 
 sub modexec_export {
   my ($secure) = @_;
   my $funcs = {};
 
-  $funcs = {
-    "foo"=>\&foo,
+  return {
+    foo => \&foo,
   };
 }
 

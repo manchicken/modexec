@@ -1,5 +1,5 @@
 # JSON.pm -- A modexec driver for JSON interaction
-# Copyright (C) 2006-2014  Michael D. Stemle, Jr.
+# Copyright (C) 2006-2016  Michael D. Stemle, Jr.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
