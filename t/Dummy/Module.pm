@@ -7,7 +7,6 @@ use 5.010;
 use base qw/Exporter ModExec::DriverHook/;
 
 sub foo {
-	say __PACKAGE__.' - FOO!';
     return ''.__PACKAGE__.' - FOO!';
 }
 
